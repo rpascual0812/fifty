@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Latest Map</string>
+    <string name="title_activity_main">Map</string>
+    <string name="search">Search</string>
+    <string name="map_type">Map Type</string>
+    <string name="zoomin">^</string>
+</resources>
