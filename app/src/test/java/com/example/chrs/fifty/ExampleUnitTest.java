@@ -1,4 +1,4 @@
-package com.example.pogi.fifty;
+package com.example.chrs.fifty;
 
 import org.junit.Test;
 

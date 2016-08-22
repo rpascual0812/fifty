@@ -1,4 +1,4 @@
-package com.example.pogi.fifty;
+package com.example.chrs.fifty;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
