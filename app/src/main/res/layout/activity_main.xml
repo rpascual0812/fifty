@@ -4,7 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:onClick="onSearch">
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -24,6 +25,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
+        <EditText
+            android:layout_width="256dp"
+            android:layout_height="63dp"
+            android:id="@+id/Search"
+            android:inputType="text"
+            android:hint="@string/search"
+            android:textColorHint="@color/link" />
         <ImageButton
             style="?android:attr/buttonStyleSmall"
             android:layout_width="49dp"
@@ -32,15 +41,7 @@
             android:contentDescription=""
             android:layout_gravity="center"
             android:onClick="onSearch"
-            android:nestedScrollingEnabled="true" />
-        <EditText
-            android:layout_width="256dp"
-            android:layout_height="63dp"
-            android:id="@+id/Search"
-            android:inputType="text"
-            android:hint="@string/search"
-            android:textColorHint="@color/link" />
-
+            android:clickable="true" />
     </LinearLayout>
 
     </RadioGroup>

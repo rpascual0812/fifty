@@ -8,16 +8,12 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,7 +30,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Bitmap b;
     LocationManager locationManager;
     private GoogleMap mMap;
-    private GoogleApiClient client;
+    //private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +39,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         b = BitmapFactory.decodeResource(getResources(), R.drawable.person);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     public void onSearch(View view) {
@@ -87,14 +83,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        final LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
         CameraPosition cameraPosition = new CameraPosition.Builder().target(center).zoom(17).bearing(40).tilt(75).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMap.setMyLocationEnabled(false);
         mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(b)));
     }
 
-    @Override
+    /*@Override
     public void onStart() {
         super.onStart();
         client.connect();
@@ -112,5 +108,5 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
-    }
+    }*/
 }
