@@ -1,6 +1,8 @@
 package com.example.chrs.fifty;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,8 +13,11 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,6 +35,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Bitmap b;
     LocationManager locationManager;
     private GoogleMap mMap;
+    LatLng center;
+    Location location;
     //private GoogleApiClient client;
 
     @Override
@@ -37,9 +44,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         b = BitmapFactory.decodeResource(getResources(), R.drawable.person);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        center = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     public void onSearch(View view) {
@@ -78,16 +91,43 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(center).zoom(17).bearing(40).tilt(75).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(center).zoom(17).bearing(40).tilt(75).build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMap.setMyLocationEnabled(false);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(b)));
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("I'm Here!!").icon(BitmapDescriptorFactory.fromBitmap(b)));
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                alertDialog.setTitle("Place your mark here");
+                final EditText input = new EditText(MainActivity.this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                alertDialog.setView(input);
+                String titulo = input.getText().toString();
+                alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Write your code here to execute after dialog
+                                Toast.makeText(getApplicationContext(),"Mark Placed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                alertDialog.setNegativeButton("NO",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Write your code here to execute after dialog
+                                dialog.cancel();
+                            }
+                        });
+                alertDialog.show();
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                mMap.addMarker(new MarkerOptions().position(latLng).title(titulo).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            }
+        });
     }
 
     /*@Override
