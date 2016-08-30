@@ -10,6 +10,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -37,7 +38,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     LatLng center;
     Location location;
-    //private GoogleApiClient client;
+    ConnectionDetector cd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +47,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         b = BitmapFactory.decodeResource(getResources(), R.drawable.person);
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        cd=new ConnectionDetector(getApplicationContext());
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         center = new LatLng(location.getLatitude(), location.getLongitude());
+        if(cd.isConnectingToInternet()) {
+        }
+
+        else {
+            ShowAlertNoInternet();
+        }
     }
 
     public void onSearch(View view) {
@@ -130,23 +137,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, "Main Page", Uri.parse("http://host/path"), Uri.parse("android-app://com.example.pogi.latestmap/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
+    public void ShowAlertNoInternet(){
+        AlertDialog.Builder alertdialogbuilder=new AlertDialog.Builder(this);
+        alertdialogbuilder.setTitle("Alert!");
+        alertdialogbuilder.setMessage("Please check if your connected to the internet?");
+        alertdialogbuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                minimizeApp();
+            }
+        });
+        AlertDialog alertDialog=alertdialogbuilder.create();
+        alertDialog.show();
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, "Main Page", Uri.parse("http://host/path"), Uri.parse("android-app://com.example.pogi.latestmap/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
-    }*/
+    public void minimizeApp() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
 }
